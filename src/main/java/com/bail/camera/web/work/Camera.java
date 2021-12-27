@@ -4,8 +4,10 @@ import org.bytedeco.javacv.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.xml.crypto.Data;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Date;
 
 /**
  * @Description：create
@@ -26,7 +28,7 @@ public class Camera {
       VideoInputFrameGrabber grabber = VideoInputFrameGrabber.createDefault(0);
       grabber.start();
       CanvasFrame canvasFrame = new CanvasFrame("摄像头");
-      canvasFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      canvasFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       canvasFrame.setAlwaysOnTop(true);
 
       while (true){
@@ -35,12 +37,18 @@ public class Camera {
          if (!isAlive) {
             grabber.stop();
             Thread.currentThread().interrupt();
+            canvasFrame.dispose();
+            break;
          }
          Frame frame = grabber.grab();
-//         Java2DFrameConverter converter = new Java2DFrameConverter();
-//         BufferedImage bufferedImage = converter.convert(frame);
-//         File file = new File("D:/image/" + System.currentTimeMillis() + ".jpg");
-//         ImageIO.write(bufferedImage, "jpg", file);
+         int seconds = new Date().getSeconds();
+         if(seconds%10==0){
+            Java2DFrameConverter converter = new Java2DFrameConverter();
+            BufferedImage bufferedImage = converter.convert(frame);
+            File file = new File("D:/我的坚果云/images" + System.currentTimeMillis() + ".jpg");
+            ImageIO.write(bufferedImage, "jpg", file);
+         }
+
          canvasFrame.showImage(frame);
          Thread.sleep(timestamp);
       }

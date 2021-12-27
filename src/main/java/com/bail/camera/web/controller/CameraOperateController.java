@@ -1,5 +1,6 @@
 package com.bail.camera.web.controller;
 
+import com.bail.camera.web.CameraConstants;
 import com.bail.camera.web.work.Camera;
 import com.bail.camera.web.work.CameraJob;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,19 +27,18 @@ public class CameraOperateController {
     private volatile Boolean openFlag = false;
 
     private Map<String, Camera> jobMap = new HashMap<>();
-    private String key = "CURRENT_CAMERA_OBJ";
+
     ExecutorService executorService = Executors.newFixedThreadPool(5);
     @RequestMapping("/open")
     public String open() throws Exception{
 
-        Future<Camera> submit = executorService.submit(new CameraJob(true, 10L));
-        jobMap.put(key, submit.get());
+        Future<Map<String, Camera>> submit = executorService.submit(new CameraJob(true, 10L,jobMap));
         return "相机启动成功";
     }
 
     @RequestMapping("/close")
     public String close(){
-        Camera camera = jobMap.get(key);
+        Camera camera = jobMap.get(CameraConstants.KEY);
         if(Objects.nonNull(camera)){
             camera.setAlive(false);
         }
